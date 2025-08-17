@@ -1,14 +1,16 @@
 import BlogCard from "./BlogCard";
 
-const BlogList = ({ posts }) => {
+const BlogList = ({ posts = [] }) => {
+  if (!posts.length) {
+    return <p className="text-gray-500 dark:text-gray-400">No posts available.</p>;
+  }
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Latest Posts</h1>
-      {posts?.length > 0 ? (
-        posts.map((post) => <BlogCard key={post.id} post={post} />)
-      ) : (
-        <p className="text-gray-500">No posts available.</p>
-      )}
+    // ⬆️ Changed to start with 2 columns on mobile instead of 1
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {posts.map((post) => (
+        <BlogCard key={post.id} post={post} />
+      ))}
     </div>
   );
 };

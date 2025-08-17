@@ -1,66 +1,117 @@
-// src/components/layout/Navbar.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import ThemeToggle from "../ui/ThemeToggle";
 
 const Navbar = ({ user }) => {
   const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (search.trim()) {
-      navigate(`/?q=${search}`);
-    }
+    setOpen(false);
+    if (search.trim()) navigate(`/?q=${encodeURIComponent(search.trim())}`);
   };
 
   return (
-    <nav className="px-6 py-4 shadow-md flex justify-between items-center bg-gradient-to-r from-blue-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 dark:text-gray-100">
-      {/* Logo */}
-      <div className="font-bold text-2xl text-blue-700 tracking-wide dark:text-purple-200">
-        <Link to="/">Medium Clone</Link>
-      </div>
-
-      {/* Search + Actions */}
-      <div className="flex gap-6 items-center">
-        <form onSubmit={handleSearch} className="flex items-center gap-2">
-          <input
-            type="text"
-            placeholder="Search posts..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700"
-          />
+    <nav className="sticky top-0 z-40 border-b bg-gradient-to-r from-blue-50 to-purple-100 backdrop-blur dark:from-gray-950 dark:to-gray-900 dark:text-gray-100 dark:border-gray-800">
+      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Left: Brand + Hamburger */}
+        <div className="flex items-center gap-3">
           <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors dark:bg-blue-700 dark:hover:bg-blue-800"
+            className="md:hidden inline-flex items-center justify-center rounded-lg border px-2 py-1 dark:border-gray-700"
+            onClick={() => setOpen((s) => !s)}
+            aria-label="Toggle menu"
           >
-            Search
+            <span className="i">☰</span>
           </button>
-        </form>
 
-        {/* Write Button */}
-        <Link
-          to="/write"
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded font-semibold transition-colors dark:bg-green-700 dark:hover:bg-green-800"
-        >
-          Write
-        </Link>
-
-        {/* Theme Toggle Button */}
-        <div className="ml-2">
-          <ThemeToggle />
+          <Link
+            to="/"
+            className="font-extrabold text-xl tracking-wide text-blue-700 dark:text-purple-200"
+            onClick={() => setOpen(false)}
+          >
+            Medium Clone
+          </Link>
         </div>
 
-        {/* Profile Avatar */}
-        <Link to="/profile" className="ml-2">
-          <img
-            src={user?.dp || "/images/default-avatar.png"}
-            alt="Profile"
-            className="w-10 h-10 rounded-full border object-cover shadow dark:border-purple-400"
-          />
-        </Link>
+        {/* Right (desktop) */}
+        <div className="hidden md:flex items-center gap-4">
+          <form onSubmit={handleSearch} className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Search posts…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="border rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700"
+            />
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors dark:bg-blue-700 dark:hover:bg-blue-800"
+            >
+              Search
+            </button>
+          </form>
+
+          <Link
+            to="/write"
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded font-semibold transition-colors dark:bg-green-700 dark:hover:bg-green-800"
+          >
+            Write
+          </Link>
+
+          <ThemeToggle />
+
+          <Link to="/profile" className="ml-1">
+            <img
+              src={user?.dp || "/images/default-avatar.png"}
+              alt="Profile"
+              className="w-9 h-9 rounded-full border object-cover shadow dark:border-purple-400"
+            />
+          </Link>
+        </div>
       </div>
+
+      {/* Mobile drawer */}
+      {open && (
+        <div className="md:hidden border-t bg-white/80 backdrop-blur dark:bg-gray-900/80 dark:border-gray-800">
+          <div className="max-w-5xl mx-auto px-4 py-4 space-y-4">
+            <form onSubmit={handleSearch} className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Search posts…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="flex-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:bg-gray-950 dark:text-gray-100 dark:border-gray-800"
+              />
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded transition-colors"
+              >
+                Search
+              </button>
+            </form>
+
+            <div className="flex items-center gap-3">
+              <Link
+                to="/write"
+                className="inline-block bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded font-semibold transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                Write
+              </Link>
+              <ThemeToggle />
+              <Link to="/profile" onClick={() => setOpen(false)}>
+                <img
+                  src={user?.dp || "/images/default-avatar.png"}
+                  alt="Profile"
+                  className="w-9 h-9 rounded-full border object-cover shadow dark:border-purple-400"
+                />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

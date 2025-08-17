@@ -4,14 +4,13 @@ export const BlogContext = createContext();
 
 export const BlogProvider = ({ children }) => {
   const [bookmarks, setBookmarks] = useState(() => {
-    const stored = localStorage.getItem("bookmarks");
-    let parsed = stored ? JSON.parse(stored) : [];
-    if (Array.isArray(parsed)) {
-      parsed = parsed.filter(
-        (b) => typeof b === "object" && b !== null && "id" in b
-      );
+    try {
+      const stored = localStorage.getItem("bookmarks");
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed.filter((b) => b && typeof b === "object" && "id" in b) : [];
+    } catch {
+      return [];
     }
-    return parsed;
   });
 
   useEffect(() => {
@@ -20,13 +19,11 @@ export const BlogProvider = ({ children }) => {
 
   const toggleBookmark = (post) => {
     setBookmarks((prev) => {
-      const validPrev = prev.filter(
-        (b) => typeof b === "object" && b !== null && "id" in b
-      );
-      const isBookmarked = validPrev.find((b) => b.id === post.id);
+      const validPrev = prev.filter((b) => b && typeof b === "object" && "id" in b);
+      const isBookmarked = validPrev.some((b) => b.id === post.id);
       return isBookmarked
         ? validPrev.filter((b) => b.id !== post.id)
-        : [...validPrev, post];
+        : [post, ...validPrev];
     });
   };
 
